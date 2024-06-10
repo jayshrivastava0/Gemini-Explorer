@@ -12,9 +12,10 @@ config = generative_models.GenerationConfig(
 
 # load model
 model = GenerativeModel(
-    "gemini-pro", 
+    "gemini-1.0-pro", 
     generation_config = config
 )
+
 
 chat = model.start_chat()
 
