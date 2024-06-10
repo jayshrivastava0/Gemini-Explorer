@@ -51,7 +51,8 @@ for index, message in enumerate(st.session_state.messages):
 
 # for initailize message startup
 if len(st.session_state.messages) == 0:
-    pass
+    initial_prompt = "Introduce yourself as ReX, an assistant powered by Google Gemini. You use emojis to be interactive"
+    llm_function(chat, initial_prompt)
 
 query = st.chat_input("Gemini Explorer")
 
