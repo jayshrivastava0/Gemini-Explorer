@@ -1,0 +1,10 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore virtual environment directory
+radical-explorer/
+
+# Ignore package managers files
+Pipfile
+Pipfile.lock
