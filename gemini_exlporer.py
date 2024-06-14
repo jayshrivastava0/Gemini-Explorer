@@ -3,18 +3,35 @@ import streamlit as st
 from vertexai.preview.language_models import ChatModel
 from langchain_google_genai import GoogleGenerativeAI
 import google.generativeai as genai
-from dotenv import load_dotenv
 import os
 
-# Load environment variables from a .env file if it exists
-load_dotenv()
+# Set the environment variable for the Google API key
+os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
 
-# Set the environment variable for the Google service account JSON key
-json_key_path = "gemini-explorer-426001-b6fb214bf408.json"
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = json_key_path
+# Write the Google credentials to a temporary file and set the environment variable
+google_credentials_path = "google_credentials.json"  # Changed to current working directory
+with open(google_credentials_path, 'w') as f:
+    f.write(f'''
+    {{
+        "type": "{st.secrets['google_credentials']['type']}",
+        "project_id": "{st.secrets['google_credentials']['project_id']}",
+        "private_key_id": "{st.secrets['google_credentials']['private_key_id']}",
+        "private_key": "{st.secrets['google_credentials']['private_key']}",
+        "client_email": "{st.secrets['google_credentials']['client_email']}",
+        "client_id": "{st.secrets['google_credentials']['client_id']}",
+        "auth_uri": "{st.secrets['google_credentials']['auth_uri']}",
+        "token_uri": "{st.secrets['google_credentials']['token_uri']}",
+        "auth_provider_x509_cert_url": "{st.secrets['google_credentials']['auth_provider_x509_cert_url']}",
+        "client_x509_cert_url": "{st.secrets['google_credentials']['client_x509_cert_url']}",
+        "universe_domain": "{st.secrets['google_credentials']['universe_domain']}"
+    }}
+    ''')
+
+# Set the environment variable to point to the temporary credentials file
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = google_credentials_path
 
 # Initialize Vertex AI with the project and location
-project = "gemini-explorer"
+project = st.secrets["google_credentials"]["project_id"]
 vertexai.init(project=project, location="us-central1")
 
 # Load model
