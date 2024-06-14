@@ -128,3 +128,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Add your JSON key file here
+gemini-explorer-426001-b6fb214bf408.json

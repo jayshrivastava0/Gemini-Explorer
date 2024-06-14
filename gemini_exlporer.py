@@ -1,74 +1,52 @@
 import vertexai
 import streamlit as st
-from vertexai.preview import generative_models
-from vertexai.preview.generative_models import GenerativeModel, Part, Content, ChatSession
-import google.generativeai as genai
+from vertexai.preview.language_models import ChatModel
 from langchain_google_genai import GoogleGenerativeAI
-from IPython.display import display
-from IPython.core.display import HTML
+import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 
-
+# Load environment variables from a .env file if it exists
 load_dotenv()
 
-os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
-llm = GoogleGenerativeAI(model='gemini-1.0-pro')
-llm.invoke("Explain AI")
+# Set the environment variable for the Google service account JSON key
+json_key_path = "gemini-explorer-426001-b6fb214bf408.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = json_key_path
 
+# Initialize Vertex AI with the project and location
 project = "gemini-explorer"
-vertexai.init(project=project)
+vertexai.init(project=project, location="us-central1")
 
-config = generative_models.GenerationConfig(
-    temperature = 0.4
-)
-
-# load model
+# Load model
 model = genai.GenerativeModel('gemini-1.0-pro')
-chat = model.start_chat(history=[])
+chat = model.start_chat()
 
-# auxilalry function to display and send messages to streamlit
-def llm_function(chat: ChatSession, query):
-    # Extract text from content parts
-    query = content.parts[0].text  # Assuming only one text part
+# Auxiliary function to display and send messages to Streamlit
+def llm_function(chat, query):
     response = chat.send_message(query)
-    output = response.candidates[0].content.parts[0].text
+    output = response.text
 
     with st.chat_message("model"):
         st.markdown(output)
 
     st.session_state.messages.append({"role": "user", "content": query})
-    st.session_state.messages.append({"role": "user", "content": output})
+    st.session_state.messages.append({"role": "model", "content": output})
 
+# Initialize chat history
+st.title("Gemini Explorer")
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# initialize chat history
-with st.title("Gemini Explorer"):
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-
-
-# display and load chat history
+# Display and load chat history
 for index, message in enumerate(st.session_state.messages):
-    content = Content(
-        role = message["role"],
-        parts = [Part.from_text(message["content"])]
-    )
     if index != 0:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-    
-    chat.history.append(content)
 
-
-# for initailize message startup
+# For initializing message startup
 if len(st.session_state.messages) == 0:
     initial_prompt = "Introduce yourself as ReX, an assistant powered by Google Gemini. You use emojis to be interactive"
-    # Extract text from parts
-    query = initial_prompt  # Assuming only one text part
-    content = Content(role="user", parts=[Part.from_text(query)])
-    llm_function(chat, query)
-    chat.history.append(content)
-
+    llm_function(chat, initial_prompt)
 
 query = st.chat_input("Gemini Explorer")
 
