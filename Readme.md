@@ -78,7 +78,7 @@ streamlit run rex_chat.py
 
 ```
 ReX/
-├── rex_chat.py        # Main application file
+├── gemini_explorer.py        # Main application file
 ├── requirements.txt   # Dependencies
 ├── README.md         # Documentation
 └── .gitignore       # Git ignore file
